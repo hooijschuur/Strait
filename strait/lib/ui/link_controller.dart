@@ -7,6 +7,8 @@ import '../abrp/credentials.dart';
 import '../abrp/live_poller.dart';
 import '../abrp/uploader.dart';
 import '../abrp/vehicle_state.dart';
+import '../mqtt/mqtt_controller.dart';
+import 'package:ocean_obd/app/app_settings.dart';
 import 'package:ocean_obd/platform/background.dart';
 import 'package:ocean_obd/platform/gps_fix.dart';
 import 'package:ocean_obd/signals/signal_table.dart';
@@ -19,16 +21,25 @@ class LinkController extends ChangeNotifier {
     required this.connect,
     required this.table,
     required this.store,
+    required this.settings,
     AbrpClient Function(AbrpCredentials)? clientFactory,
     Stream<GpsFix> Function()? gps,
   })  : _clientFactory = clientFactory ?? ((c) => AbrpClient(c)),
-        _gps = gps ?? Background.gpsFixes;
+        _gps = gps ?? Background.gpsFixes,
+        _mqttController = MqttController(
+          connect: connect,
+          table: table,
+          settings: settings,
+          vehicle: VehicleState(),
+        );
 
   final ConnectController connect;
   final SignalTable table;
   final CredentialStore store;
+  final AppSettings settings;
   final AbrpClient Function(AbrpCredentials) _clientFactory;
   final Stream<GpsFix> Function() _gps;
+  final MqttController _mqttController;
 
   AbrpCredentials? credentials;
   String? error;
@@ -46,6 +57,7 @@ class LinkController extends ChangeNotifier {
   bool get hasCredentials => credentials?.isComplete ?? false;
   LivePollerStats? get pollerStats => _poller?.stats;
   AbrpUploader? get uploader => _uploader;
+  MqttController get mqttController => _mqttController;
 
   /// Verified signals that go to ABRP.
   List<SignalDef> get abrpSignals => [
@@ -144,6 +156,7 @@ class LinkController extends ChangeNotifier {
     _client?.close();
     _client = null;
     await Background.stop('abrp');
+    await _mqttController.stop();
     notifyListeners();
   }
 
@@ -201,6 +214,7 @@ class LinkController extends ChangeNotifier {
     _poller?.stop();
     _uploader?.stop();
     _gpsSub?.cancel();
+    _mqttController.dispose();
     super.dispose();
   }
 }

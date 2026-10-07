@@ -26,7 +26,7 @@ Future<void> main() async {
   await settings.load();
 
   final connect = ConnectController(table);
-  final link = LinkController(connect: connect, table: table, store: SecureCredentialStore());
+  final link = LinkController(connect: connect, table: table, store: SecureCredentialStore(), settings: settings);
   await link.load();
 
   runApp(StraitApp(settings: settings, connect: connect, link: link));
