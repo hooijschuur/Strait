@@ -6,6 +6,7 @@ import '../abrp/credentials.dart';
 import 'package:ocean_obd/app/app_settings.dart';
 import 'package:ocean_obd/util/units.dart';
 import 'link_controller.dart';
+import 'settings_screen.dart';
 
 /// The ABRP tab (PLAN.md §5.2): the user's own API key and token, the live
 /// link, and what was last sent.
@@ -69,6 +70,13 @@ class _LinkScreenState extends State<LinkScreen> {
                   color: theme.colorScheme.errorContainer,
                   child: Padding(padding: const EdgeInsets.all(12), child: Text(c.error!)),
                 ),
+              if (c.mqttController.error != null)
+                Card(
+                  color: theme.colorScheme.errorContainer,
+                  child: Padding(padding: const EdgeInsets.all(12), child: Text(c.mqttController.error!)),
+                ),
+              _mqttCard(context),
+              const SizedBox(height: 12),
               _credentialsCard(context),
               const SizedBox(height: 12),
               if (c.hasCredentials) _linkCard(context),
@@ -246,6 +254,105 @@ class _LinkScreenState extends State<LinkScreen> {
     );
   }
 
+  Widget _mqttCard(BuildContext context) {
+    final mqtt = c.mqttController;
+    final settings = widget.settings;
+    
+    if (!settings.mqttEnabled) {
+      return Card(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Text('Home Assistant via MQTT'),
+              const SizedBox(height: 8),
+              const Text('MQTT is not enabled. Enable it in Settings to send data to Home Assistant via Tailscale.'),
+              const SizedBox(height: 8),
+              FilledButton(
+                onPressed: () => _navigateToMqttSettings(context),
+                child: const Text('Configure MQTT'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+    
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Home Assistant via MQTT', style: TextStyle(fontWeight: FontWeight.bold)),
+                Switch(
+                  value: mqtt.isLinking,
+                  onChanged: (value) async {
+                    if (value) {
+                      await mqtt.start();
+                    } else {
+                      await mqtt.stop();
+                    }
+                  },
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            _row('MQTT Status', _getMqttStatusText(mqtt)),
+            _row('Broker', '${settings.mqttBrokerHost}:${settings.mqttBrokerPort}'),
+            if (mqtt.isConnected) ...[
+              _row('HA Device', settings.homeAssistantDeviceName),
+              _row('Discovery', settings.homeAssistantDiscoverySent ? 'Sent' : 'Not sent'),
+            ],
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                OutlinedButton(
+                  onPressed: () => _navigateToMqttSettings(context),
+                  child: const Text('Settings'),
+                ),
+                if (mqtt.isConnected)
+                  OutlinedButton(
+                    onPressed: () async {
+                      final success = await mqtt.sendTestMessage();
+                      if (success) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Test message sent successfully')),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Failed to send test message')),
+                        );
+                      }
+                    },
+                    child: const Text('Test'),
+                  ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _navigateToMqttSettings(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => MqttSettingsScreen(controller: c)),
+    );
+  }
+
+  String _getMqttStatusText(MqttController mqtt) {
+    if (!mqtt.isLinking) return 'Stopped';
+    if (!mqtt.isConnected) return 'Connecting...';
+    return 'Connected';
+  }
+
   Widget _row(String label, String value) => Padding(
         padding: const EdgeInsets.symmetric(vertical: 2),
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -254,3 +361,4 @@ class _LinkScreenState extends State<LinkScreen> {
         ]),
       );
 }
+
