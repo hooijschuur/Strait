@@ -1,0 +1,259 @@
+{
+  "car_model": "Fisker: Ocean",
+  "init": "ATSP6;ATST96;ATFCSD300000;ATFCSM1;",
+  "pids": [
+    {
+      "pid": "2220501",
+      "pid_init": "ATSH7E1;ATFCSH7E1;ATCRA7E9;",
+      "parameters": [
+        {
+          "name": "SOC",
+          "expression": "[B4:B5]*0.1",
+          "unit": "%",
+          "class": "battery",
+          "min": "0",
+          "max": "100",
+          "poll_s": 1
+        }
+      ]
+    },
+    {
+      "pid": "2221071",
+      "pid_init": "ATSH7E1;ATFCSH7E1;ATCRA7E9;",
+      "parameters": [
+        {
+          "name": "HV_V",
+          "expression": "[B4:B5]*0.1",
+          "unit": "V",
+          "class": "voltage",
+          "min": "200",
+          "max": "480",
+          "poll_s": 1
+        }
+      ]
+    },
+    {
+      "pid": "2220041",
+      "pid_init": "ATSH7E1;ATFCSH7E1;ATCRA7E9;",
+      "parameters": [
+        {
+          "name": "HV_A",
+          "expression": "([B4:B5]*0.1)-2000",
+          "unit": "A",
+          "class": "current",
+          "poll_s": 1
+        }
+      ]
+    },
+    {
+      "pid": "2220891",
+      "pid_init": "ATSH7E1;ATFCSH7E1;ATCRA7E9;",
+      "parameters": [
+        {
+          "name": "BATT_TEMP",
+          "expression": "[B4:B5]*0.01",
+          "unit": "\u00b0C",
+          "class": "temperature",
+          "min": "-40",
+          "max": "80",
+          "poll_s": 30
+        }
+      ]
+    },
+    {
+      "pid": "22EFF71",
+      "pid_init": "ATSH7C2;ATFCSH7C2;ATCRA7CA;",
+      "parameters": [
+        {
+          "name": "SPEED",
+          "expression": "[B4:B5]*0.1",
+          "unit": "km/h",
+          "class": "speed",
+          "poll_s": 1
+        }
+      ]
+    },
+    {
+      "pid": "2234091",
+      "pid_init": "ATSH7C1;ATFCSH7C1;ATCRA7C9;",
+      "parameters": [
+        {
+          "name": "ODOMETER",
+          "expression": "[B4:B7]*0.01",
+          "class": "distance",
+          "unit": "km",
+          "min": "0",
+          "poll_s": 60
+        }
+      ]
+    },
+    {
+      "pid": "22EFF91",
+      "pid_init": "ATSH7C2;ATFCSH7C2;ATCRA7CA;",
+      "parameters": [
+        {
+          "name": "AUX_VOLTAGE",
+          "expression": "[B4:B5]*0.001",
+          "unit": "V",
+          "class": "voltage",
+          "poll_s": 30
+        }
+      ]
+    },
+    {
+      "pid": "2221361",
+      "pid_init": "ATSH7E1;ATFCSH7E1;ATCRA7E9;",
+      "parameters": [
+        {
+          "name": "CELL_V_MIN",
+          "expression": "[B4:B5]*0.001",
+          "unit": "V",
+          "class": "voltage",
+          "poll_s": 10
+        }
+      ]
+    },
+    {
+      "pid": "2221371",
+      "pid_init": "ATSH7E1;ATFCSH7E1;ATCRA7E9;",
+      "parameters": [
+        {
+          "name": "CELL_V_MAX",
+          "expression": "[B4:B5]*0.001",
+          "unit": "V",
+          "class": "voltage",
+          "poll_s": 10
+        }
+      ]
+    },
+    {
+      "pid": "2221381",
+      "pid_init": "ATSH7E1;ATFCSH7E1;ATCRA7E9;",
+      "parameters": [
+        {
+          "name": "CELL_V_AVG",
+          "expression": "[B4:B5]*0.001",
+          "unit": "V",
+          "class": "voltage",
+          "poll_s": 10
+        }
+      ]
+    },
+    {
+      "pid": "2220471",
+      "pid_init": "ATSH7E1;ATFCSH7E1;ATCRA7E9;",
+      "parameters": [
+        {
+          "name": "SOC_MIN",
+          "expression": "[B4:B5]*0.1",
+          "unit": "%",
+          "class": "battery",
+          "poll_s": 10
+        }
+      ]
+    },
+    {
+      "pid": "2220481",
+      "pid_init": "ATSH7E1;ATFCSH7E1;ATCRA7E9;",
+      "parameters": [
+        {
+          "name": "SOC_MAX",
+          "expression": "[B4:B5]*0.1",
+          "unit": "%",
+          "class": "battery",
+          "poll_s": 10
+        }
+      ]
+    },
+    {
+      "pid": "2220491",
+      "pid_init": "ATSH7E1;ATFCSH7E1;ATCRA7E9;",
+      "parameters": [
+        {
+          "name": "SOC_AVG",
+          "expression": "[B4:B5]*0.1",
+          "unit": "%",
+          "class": "battery",
+          "poll_s": 10
+        }
+      ]
+    },
+    {
+      "pid": "2234271",
+      "pid_init": "ATSH7C1;ATFCSH7C1;ATCRA7C9;",
+      "parameters": [
+        {
+          "name": "TYRE_P_FL",
+          "expression": "B4*1.379",
+          "class": "pressure",
+          "unit": "kPa",
+          "min": "0",
+          "poll_s": 60
+        },
+        {
+          "name": "TYRE_P_FR",
+          "expression": "B5*1.379",
+          "class": "pressure",
+          "unit": "kPa",
+          "min": "0",
+          "poll_s": 60
+        },
+        {
+          "name": "TYRE_P_RL",
+          "expression": "B6*1.379",
+          "class": "pressure",
+          "unit": "kPa",
+          "min": "0",
+          "poll_s": 60
+        },
+        {
+          "name": "TYRE_P_RR",
+          "expression": "B7*1.379",
+          "class": "pressure",
+          "unit": "kPa",
+          "min": "0",
+          "poll_s": 60
+        }
+      ]
+    },
+    {
+      "pid": "2220611",
+      "pid_init": "ATSH7E1;ATFCSH7E1;ATCRA7E9;",
+      "parameters": [
+        {
+          "name": "BMS_STATE",
+          "expression": "B4",
+          "unit": "",
+          "class": "none",
+          "poll_s": 5
+        }
+      ]
+    },
+    {
+      "pid": "2220161",
+      "pid_init": "ATSH7E1;ATFCSH7E1;ATCRA7E9;",
+      "parameters": [
+        {
+          "name": "DRIVE_CURRENT",
+          "expression": "[B4:B7]*0.1",
+          "unit": "A",
+          "class": "current",
+          "poll_s": 1
+        }
+      ]
+    },
+    {
+      "pid": "2220031",
+      "pid_init": "ATSH7E1;ATFCSH7E1;ATCRA7E9;",
+      "parameters": [
+        {
+          "name": "HV_V_SMOOTH",
+          "expression": "[B4:B5]*0.1",
+          "unit": "V",
+          "class": "voltage",
+          "poll_s": 5
+        }
+      ]
+    }
+  ]
+}
