@@ -1,0 +1,384 @@
+# Home Assistant MQTT Configuration for Fisker Ocean via WiCAN Pro (wambs fork)
+# This configuration assumes you have MQTT broker set up and WiCAN Pro is configured
+# to send data to the topics specified below.
+
+# Add this to your configuration.yaml or create a separate file in your
+# Home Assistant config directory and include it.
+
+# MQTT Broker configuration (if not already set up)
+# mqtt:
+#   broker: [YOUR_MQTT_BROKER_IP]
+#   username: [YOUR_USERNAME]
+#   password: [YOUR_PASSWORD]
+
+# =============================================================================
+# Fisker Ocean Sensors via WiCAN Pro
+# =============================================================================
+
+# Main Battery and Vehicle Sensors
+sensor:
+  # State of Charge (SOC) - Main battery percentage
+  - platform: mqtt
+    name: "Fisker Ocean SOC"
+    state_topic: "wican/fisker/ocean/soc"
+    unit_of_measurement: "%"
+    device_class: battery
+    value_template: "{{ value | float }}"
+    availability:
+      - topic: "wican/fisker/ocean/availability"
+        payload_available: "online"
+        payload_not_available: "offline"
+
+  # HV Pack Voltage
+  - platform: mqtt
+    name: "Fisker Ocean HV Voltage"
+    state_topic: "wican/fisker/ocean/hv_v"
+    unit_of_measurement: "V"
+    device_class: voltage
+    value_template: "{{ value | float }}"
+
+  # HV Pack Current
+  - platform: mqtt
+    name: "Fisker Ocean HV Current"
+    state_topic: "wican/fisker/ocean/hv_a"
+    unit_of_measurement: "A"
+    device_class: current
+    value_template: "{{ value | float }}"
+
+  # Battery Temperature
+  - platform: mqtt
+    name: "Fisker Ocean Battery Temperature"
+    state_topic: "wican/fisker/ocean/batt_temp"
+    unit_of_measurement: "°C"
+    device_class: temperature
+    value_template: "{{ value | float }}"
+
+  # Vehicle Speed
+  - platform: mqtt
+    name: "Fisker Ocean Speed"
+    state_topic: "wican/fisker/ocean/speed"
+    unit_of_measurement: "km/h"
+    device_class: speed
+    value_template: "{{ value | float }}"
+
+  # Odometer
+  - platform: mqtt
+    name: "Fisker Ocean Odometer"
+    state_topic: "wican/fisker/ocean/odometer"
+    unit_of_measurement: "km"
+    device_class: distance
+    value_template: "{{ value | float }}"
+
+  # 12V Auxiliary Battery Voltage
+  - platform: mqtt
+    name: "Fisker Ocean 12V Battery"
+    state_topic: "wican/fisker/ocean/aux_voltage"
+    unit_of_measurement: "V"
+    device_class: voltage
+    value_template: "{{ value | float }}"
+
+  # Cell Voltages
+  - platform: mqtt
+    name: "Fisker Ocean Cell Voltage Min"
+    state_topic: "wican/fisker/ocean/cell_v_min"
+    unit_of_measurement: "V"
+    device_class: voltage
+    value_template: "{{ value | float }}"
+
+  - platform: mqtt
+    name: "Fisker Ocean Cell Voltage Max"
+    state_topic: "wican/fisker/ocean/cell_v_max"
+    unit_of_measurement: "V"
+    device_class: voltage
+    value_template: "{{ value | float }}"
+
+  - platform: mqtt
+    name: "Fisker Ocean Cell Voltage Average"
+    state_topic: "wican/fisker/ocean/cell_v_avg"
+    unit_of_measurement: "V"
+    device_class: voltage
+    value_template: "{{ value | float }}"
+
+  # SOC Min/Max/Avg (from cell SOC)
+  - platform: mqtt
+    name: "Fisker Ocean SOC Min"
+    state_topic: "wican/fisker/ocean/soc_min"
+    unit_of_measurement: "%"
+    device_class: battery
+    value_template: "{{ value | float }}"
+
+  - platform: mqtt
+    name: "Fisker Ocean SOC Max"
+    state_topic: "wican/fisker/ocean/soc_max"
+    unit_of_measurement: "%"
+    device_class: battery
+    value_template: "{{ value | float }}"
+
+  - platform: mqtt
+    name: "Fisker Ocean SOC Average"
+    state_topic: "wican/fisker/ocean/soc_avg"
+    unit_of_measurement: "%"
+    device_class: battery
+    value_template: "{{ value | float }}"
+
+  # Drive Current (without auxiliaries)
+  - platform: mqtt
+    name: "Fisker Ocean Drive Current"
+    state_topic: "wican/fisker/ocean/drive_current"
+    unit_of_measurement: "A"
+    device_class: current
+    value_template: "{{ value | float }}"
+
+  # Smooth HV Voltage
+  - platform: mqtt
+    name: "Fisker Ocean HV Voltage Smooth"
+    state_topic: "wican/fisker/ocean/hv_v_smooth"
+    unit_of_measurement: "V"
+    device_class: voltage
+    value_template: "{{ value | float }}"
+
+  # BMS State
+  - platform: mqtt
+    name: "Fisker Ocean BMS State"
+    state_topic: "wican/fisker/ocean/bms_state"
+    value_template: "{{ value }}"
+
+# Tire Pressure Sensors
+  - platform: mqtt
+    name: "Fisker Ocean Tire Pressure FL"
+    state_topic: "wican/fisker/ocean/tyre_p_fl"
+    unit_of_measurement: "kPa"
+    device_class: pressure
+    value_template: "{{ value | float }}"
+
+  - platform: mqtt
+    name: "Fisker Ocean Tire Pressure FR"
+    state_topic: "wican/fisker/ocean/tyre_p_fr"
+    unit_of_measurement: "kPa"
+    device_class: pressure
+    value_template: "{{ value | float }}"
+
+  - platform: mqtt
+    name: "Fisker Ocean Tire Pressure RL"
+    state_topic: "wican/fisker/ocean/tyre_p_rl"
+    unit_of_measurement: "kPa"
+    device_class: pressure
+    value_template: "{{ value | float }}"
+
+  - platform: mqtt
+    name: "Fisker Ocean Tire Pressure RR"
+    state_topic: "wican/fisker/ocean/tyre_p_rr"
+    unit_of_measurement: "kPa"
+    device_class: pressure
+    value_template: "{{ value | float }}"
+
+# =============================================================================
+# Calculated Sensors (using template sensors)
+# =============================================================================
+
+template:
+  # HV Power (kW) - Calculated from Voltage * Current / 1000
+  - sensor:
+      - name: "Fisker Ocean HV Power"
+        unit_of_measurement: "kW"
+        device_class: power
+        state: >
+          {% set voltage = states('sensor.fisker_ocean_hv_voltage') | float(0) %}
+          {% set current = states('sensor.fisker_ocean_hv_current') | float(0) %}
+          {{ ((voltage * current) / 1000) | round(2) }}
+
+  # Battery Energy Remaining (kWh) - Calculated from SOC and estimated capacity
+  # Note: Adjust capacity based on your Fisker Ocean battery size (113 kWh for Extreme/One)
+  - sensor:
+      - name: "Fisker Ocean Energy Remaining"
+        unit_of_measurement: "kWh"
+        device_class: energy
+        state: >
+          {% set soc = states('sensor.fisker_ocean_soc') | float(0) %}
+          {% set capacity = 113 %}  # Adjust based on your model
+          {{ ((soc / 100) * capacity) | round(2) }}
+
+  # Battery Range Estimate (km) - Simple calculation
+  # Note: Adjust consumption based on your driving style (average ~18 kWh/100km)
+  - sensor:
+      - name: "Fisker Ocean Estimated Range"
+        unit_of_measurement: "km"
+        device_class: distance
+        state: >
+          {% set energy = states('sensor.fisker_ocean_energy_remaining') | float(0) %}
+          {% set consumption = 0.18 %}  # kWh/km (adjust as needed)
+          {{ (energy / consumption) | round(1) }}
+
+  # Charging Status (derived from current)
+  - binary_sensor:
+      - name: "Fisker Ocean Is Charging"
+        device_class: battery_charging
+        state: >
+          {% set current = states('sensor.fisker_ocean_hv_current') | float(0) %}
+          {% if current < -5 %}
+            on
+          {% else %}
+            off
+          {% endif %}
+
+  # DC Fast Charging Status (derived from power)
+  - binary_sensor:
+      - name: "Fisker Ocean Is DC Fast Charging"
+        device_class: battery_charging
+        state: >
+          {% set power = states('sensor.fisker_ocean_hv_power') | float(0) %}
+          {% if power < -12 %}
+            on
+          {% else %}
+            off
+          {% endif %}
+
+# =============================================================================
+# Utility Sensors for Monitoring
+# =============================================================================
+
+utility_meter:
+  # Daily energy used
+  fisker_ocean_daily_energy:
+    source: sensor.fisker_ocean_hv_power
+    cycle: daily
+    tariffs: ["peak", "off_peak"]
+
+# =============================================================================
+# WiCAN Pro Device Status
+# =============================================================================
+
+# WiCAN Pro connection status
+binary_sensor:
+  - platform: mqtt
+    name: "WiCAN Pro Connection"
+    state_topic: "wican/fisker/ocean/availability"
+    payload_on: "online"
+    payload_off: "offline"
+    device_class: connectivity
+
+# =============================================================================
+# Groups for Better Organization
+# =============================================================================
+
+group:
+  fisker_ocean_battery:
+    name: "Fisker Ocean Battery"
+    entities:
+      - sensor.fisker_ocean_soc
+      - sensor.fisker_ocean_hv_voltage
+      - sensor.fisker_ocean_hv_current
+      - sensor.fisker_ocean_hv_power
+      - sensor.fisker_ocean_battery_temperature
+      - sensor.fisker_ocean_energy_remaining
+      - sensor.fisker_ocean_estimated_range
+
+  fisker_ocean_tires:
+    name: "Fisker Ocean Tires"
+    entities:
+      - sensor.fisker_ocean_tire_pressure_fl
+      - sensor.fisker_ocean_tire_pressure_fr
+      - sensor.fisker_ocean_tire_pressure_rl
+      - sensor.fisker_ocean_tire_pressure_rr
+
+  fisker_ocean_charging:
+    name: "Fisker Ocean Charging"
+    entities:
+      - binary_sensor.fisker_ocean_is_charging
+      - binary_sensor.fisker_ocean_is_dc_fast_charging
+      - sensor.fisker_ocean_hv_current
+      - sensor.fisker_ocean_hv_power
+
+# =============================================================================
+# Automation Examples
+# =============================================================================
+
+automation:
+  # Notify when SOC is low
+  - alias: "Fisker Ocean Low Battery Warning"
+    trigger:
+      - platform: numeric_state
+        entity_id: sensor.fisker_ocean_soc
+        below: 20
+    action:
+      - service: notify.notify
+        data:
+          message: "Fisker Ocean SOC is low: {{ states('sensor.fisker_ocean_soc') }}%"
+          title: "Low Battery Warning"
+
+  # Notify when charging is complete (SOC reaches 80%)
+  - alias: "Fisker Ocean Charging Complete"
+    trigger:
+      - platform: numeric_state
+        entity_id: sensor.fisker_ocean_soc
+        above: 79.5
+    condition:
+      - condition: state
+        entity_id: binary_sensor.fisker_ocean_is_charging
+        state: "on"
+    action:
+      - service: notify.notify
+        data:
+          message: "Fisker Ocean has reached 80% SOC while charging"
+          title: "Charging Complete"
+
+  # Track charging sessions
+  - alias: "Fisker Ocean Charging Session Start"
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.fisker_ocean_is_charging
+        to: "on"
+    action:
+      - service: input_datetime.set_datetime
+        target:
+          entity_id: input_datetime.fisker_charging_start
+        data:
+          datetime: "{{ now().isoformat() }}"
+
+  - alias: "Fisker Ocean Charging Session End"
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.fisker_ocean_is_charging
+        to: "off"
+        for:
+          minutes: 5
+    action:
+      - service: input_datetime.set_datetime
+        target:
+          entity_id: input_datetime.fisker_charging_end
+        data:
+          datetime: "{{ now().isoformat() }}"
+
+# =============================================================================
+# Input Helpers (for automations)
+# =============================================================================
+
+input_datetime:
+  fisker_charging_start:
+    name: "Fisker Charging Start Time"
+    has_time: true
+    has_date: true
+
+  fisker_charging_end:
+    name: "Fisker Charging End Time"
+    has_time: true
+    has_date: true
+
+input_number:
+  fisker_battery_capacity:
+    name: "Fisker Battery Capacity"
+    initial: 113
+    min: 50
+    max: 150
+    step: 1
+    unit_of_measurement: "kWh"
+    mode: box
+
+  fisker_energy_consumption:
+    name: "Fisker Energy Consumption"
+    initial: 0.18
+    min: 0.1
+    max: 0.3
+    step: 0.01
+    unit_of_measurement: "kWh/km"
+    mode: box
